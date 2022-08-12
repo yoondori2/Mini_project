@@ -1,5 +1,7 @@
 package kr.co.iochord.config;
 
+import javax.annotation.Resource;
+
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -10,6 +12,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -17,9 +21,12 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import kr.co.iochord.beans.UserBean;
+import kr.co.iochord.interceptor.CheckLoginInterceptor;
 import kr.co.iochord.interceptor.TopMenuInterceptor;
 import kr.co.iochord.mapper.BoardMapper;
 import kr.co.iochord.mapper.TopMenuMapper;
+import kr.co.iochord.mapper.UserMapper;
 import kr.co.iochord.service.TopMenuService;
 
 // Spring MVC 프로젝트에 관련된 설정을 하는 클래스
@@ -49,6 +56,9 @@ public class ServletAppContext implements WebMvcConfigurer{
 	//topmenuservice 주입받기. 생성된 객체를 주입받는 것이기때문에 여러군데서 주입받아도 상관없다. 
 	@Autowired
 	private TopMenuService topmenuService;
+	
+	@Resource(name= "loginUserBean")
+	private UserBean loginUserBean;
 	
 	// Controller의 메서드가 반환하는 jsp의 이름 앞뒤에 경로와 확장자를 붙혀주도록 설정한다.
 	@Override
@@ -101,17 +111,51 @@ public class ServletAppContext implements WebMvcConfigurer{
 		factoryBean.setSqlSessionFactory(factory); 
 		return factoryBean;
 	}
-	//top-menu interceptor로 등록하기 
+	//UserMapper에서 bean을 주입받는다. 
+	@Bean
+	public MapperFactoryBean<UserMapper> getUserMapper(SqlSessionFactory factory) throws Exception{
+		MapperFactoryBean<UserMapper> factoryBean = new MapperFactoryBean<UserMapper>(UserMapper.class);
+		factoryBean.setSqlSessionFactory(factory); 
+		return factoryBean;
+	}
+	//interceptor로 등록하기 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		// TODO Auto-generated method stub
 		WebMvcConfigurer.super.addInterceptors(registry);
 		
-		TopMenuInterceptor topMenuInterceptor = new TopMenuInterceptor(topmenuService);
+		//top 메뉴에 등록하기 
+		TopMenuInterceptor topMenuInterceptor = new TopMenuInterceptor(topmenuService,loginUserBean);
 		
 		InterceptorRegistration reg1 = registry.addInterceptor(topMenuInterceptor);
 		//모든 요청 주소에 대해 인터셉터가 작동하게 된다. 
 		reg1.addPathPatterns("/**");
+		
+		//로그인 여부 메뉴에 등록하기 
+		CheckLoginInterceptor checkLoginInterceptor = new CheckLoginInterceptor(loginUserBean);
+		
+		InterceptorRegistration reg2 = registry.addInterceptor(checkLoginInterceptor);
+		
+		//정보 수정 눌렀을 때 interceptor 통과하도록 함. 
+		reg2.addPathPatterns("/user/modify","/user/logout","/board/*");
+		//main만 제외하겠다라는 의미
+		reg2.excludePathPatterns("/board/main");
+		
+	}
+	//message로 등록하면 db에 저장한 properties 읽어오지 못해서 오류남. 
+	//별도로 관리하게끔 해준다.
+	//error_message 와 db 메세지 따로 관리가 된다. 
+	@Bean
+	public static PropertySourcesPlaceholderConfigurer propertySourcePlaceHolderConfigurer() {
+		return new PropertySourcesPlaceholderConfigurer();
+	}
+	
+	
+	@Bean
+	public ReloadableResourceBundleMessageSource messageSource() {
+		ReloadableResourceBundleMessageSource res = new ReloadableResourceBundleMessageSource();
+		res.addBasenames("/WEB-INF/properties/error_message");
+		return res;
 	}
 }
 
