@@ -197,12 +197,16 @@
 2. UserDao에서 Mapper @Autowired로 주입받기
 3. UserService에서 Dao @Autowired로 주입받기
 4. UserController에서 Service주입받아서 쿼리실행하기.
+5. join_success.jsp 로 이동 (alert창으로 가입완료 띄워주고 login.jsp로 이동하기)
 ---
 ## 로그인
 ### 로그인 처리
 - 사용자 로그인 기능을 구현한다.
 - 아이디, 비밀번호 유효성 검사를 시행한다. 
 - 로그인 성공시 사용자 정보를 세션에 저장한다. 
+
+### 과정
+1. 
 ---
 ## 로그아웃 
 - session에 로그인여부 값을 false로 변경해준다. 
