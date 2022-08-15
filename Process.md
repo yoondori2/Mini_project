@@ -19,13 +19,16 @@
 - BasicDataSource : 데이터 베이스 접속정보를 관리하고 있는 객체
 4. SqlSessionFactory 정의하기
 - SqlSessionFactory 는 접속, 쿼리관리등을 하고있는 객체 
-- 나중에 쿼리를 실행할때 이것을 주입받아서 실행하게 된다. 
+- 나중에 쿼리를 실행할때 이것을 주입받아서 실행하게 된다. </br>
+
 5. Mapper bean 정의하기
 - 쿼리문을 만드는 Mapper를 정의한다. 
 - 이 mapper를 주입받아 쿼리를 실행하게 된다. 
-- 정의하기 전에 사용할 mapper(ex:userMapper, boardMapper 등)을 인터페이스로 구현한 후 이 타입으로 정의해준다. 
+- 정의하기 전에 사용할 mapper(ex:userMapper, boardMapper 등)을 인터페이스로 구현한 후 이 타입으로 정의해준다. </br>
+
 6. Mapper 주입
-- 쿼리를 동작시켜야 하는 곳에서 Mapper를 주입받는다. (@Autowired 사용하여)
+- 쿼리를 동작시켜야 하는 곳에서 Mapper를 주입받는다. (@Autowired 사용하여)</br>
+
 7. 쿼리 실행 
 - 필요한 쿼리를 Mapper를 통해 실행한다. (ex: mapper.insert(data);) 
 
@@ -204,17 +207,75 @@
 - 사용자 로그인 기능을 구현한다.
 - 아이디, 비밀번호 유효성 검사를 시행한다. 
 - 로그인 성공시 사용자 정보를 세션에 저장한다. 
+- 로그인한 사람의 정보를 빈에 담아 세션영역에 담아 사용할 것이다. --> sessionscope를 사용할것이다. 
 
 ### 과정
-1. 
+1. UserBean에 로그인 여부 값을 담을 변수 만들기 (userLogin) , 초기값을 false로 준다. (생성자로) , setter,getter 메소드 만들기
+2. 데이터를 저장하거나 관리하기위한 빈들은 RootAppContext 에 정의하면 된다. 
+3. @SessionScope, @Bean으로 메소드 위에 적어준다. 
+4. login.jsp에서 spring에서 제공하는 form 태그로 바꿔주기. </br>
+- modelAttribute는 TempLoginUserBean으로 적어준다. 
+5.error_message.properties에 원하는 메세지 적어주기. </br>
+6.UserMapper에 쿼리문 쓴다. </br>
+7.UserDao에서 UserMapper주입받기</br>
+8.UserService에서 UserDao 주입받기 </br> 
+    1) Session에 담아야하므로 loginUserBean을 주입받아온다. 
+    2) 로그인을 성공했을 경우 loginUserBean에 담아준다. 
+9.UserController로 가서 loginUserBean을 주입받아온다. 
+    1) login_pro에서 로그인이 성공했을 경우 login_success로 이동하게 하기.
+    2) @GetMapper("/login")에서 파라미터로 로그인 실패했는지 여부 넘겨야하므로 
+      @requestParam(value="fail",defaultValue="false" boolean fail, Model model) 실패한 값 model에 담겨서 넘겨준다.</br>
+      --> 값이 false이면 로그인 실패 안뜨게 하기. 
+    3) login.jsp에서 if문 사용해서 fail==true이면 로그인 실패 뜨게 하기.
+    4) login_fail로 가는 경우 location.href= ?fail=true로 넘기기. 
+    5) login_success로 가는 경우 main으로 이동하게 하기.
+      
+    
 ---
-## 로그아웃 
-- session에 로그인여부 값을 false로 변경해준다. 
+## 상단 메뉴 처리 및 로그아웃 
+- 로그아웃: session에 로그인여부 값을 false로 변경해준다. 
+
+### 과정
+1. 로그아웃
+- UserController에 @GetMapping("/logout")에 loginUserBean.setUserLogin(false)값 입력해주기.
+2. 상단 메뉴 처리</br>
+
+   1)ServeletAppContext에서 loginUserBean을 주입받고 addInterceptors에서 Interceptor로 전달한다.</br> 
+   2)TopMenuInterceptor에서 생성자로 loginUserBean 을 담아주고 prehandle에서 
+요청값에 loginUserBean의 이름으로 값을 담아준다.</br> 
+   3)top_menu에서 loginUserBean.userLogin이 true이면 정보수정,로그아웃 노출되도록 하게 만들어주기.</br>
+   4)logout.jsp에서 alert창으로 로그아웃됨을 알려주고 main으로 이동하도록 적어주기.</br>
 ---
 ## 로그인 확인 처리
 - 직접 주소치면 들어갈 수 있기때문에 이 부분을 해결해야하기 위한 처리이다,. 
 - 로그인을 하지 않으면 접근을 하지 못하도록 하는 처리이다.</br>
 -> Interceptor에서 로그인 여부를 확인하고 로그인 하였을 경우에만 다음 단계 진행하도록 한다.
+
+### 과정
+1. CheckLoginInterceptor에서 loginUserBean이 false이면 (로그인안했으면) not_login으로 이동하게 하기.
+2. ServletAppContext의 addInterceptors에서 checkLoginInterceptor객체 만들고 
+정보수정이나 로그아웃, 게시판에 들어가면 이 인터셉터를 꼭 거치도록 적어주기. 
+3.not_login.jsp에 alert으로 로그인해주세요 띄우고 login으로 이동하게 하기.
+
 ---
 ## 정보 수정 처리 
 - 로그인한 사용자의 정보 수정하는 기능 처리하기.
+
+### 과정
+1. modify.jsp에 spring 이 제공하는 form으로 바꿔주기, modelAttribute는 modifyUserBean으로 바꿔주기
+2. 아이디, 이름은 바꾸지못하게할것이라 readonly=true로 적어준다. (* disabled 가 true이면 값 안넘어가므로 이렇게 적기)</br>
+3. UserMapper에 아이디,이름 정보 가져오는 쿼리문 작성해준다.</br> 
+4. UserDao에 UserMapper를 주입받아온다. </br>
+5. UserService에서 UserDao를 주입받아온다. </br>
+   1) UserController에서 주입받아온 modifyUserBean을 매개변수로 가져온다. </br>
+   2) UserController에서 userService.getModifyUserInfo실행할때 주입받은 modfiyUserBean을 넘기기.</br> 
+   3) modifyUserBean에 수정한 tempModifyUserBean 값을 담아준다.</br>
+6. UserController에서 @PostMapping("/modify_pro")에서 수정할때 유효성검사가 다 끝난 결과값을 if문으로 처리하여 성공한경우 modify_success로 이동하게 하기</br> 
+7. error.messages에 적어주기.</br>
+8. UserMapper에 Update 쿼리문 적어주기</br>
+9. UserDao에 UserMapper주입받아오기</br>
+10. UserService에 UserDao 주입받아오기 </br>
+11. UserController에서 userService주입받아 실행하기.성공하면 modify_success로 이동하기. </br>
+
+
+
