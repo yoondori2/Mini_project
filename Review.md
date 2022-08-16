@@ -16,8 +16,12 @@
 
 [3.SessionScope와 ApplicationScope의 차이는?](#SessionScope와-ApplicationScope의-차이)
 
+[4.@Autowired 동작하는 원리, 이름이 같은 bean이 있는 경우 어떻게 스프링이 처리하는가?](#@Autowired동작원리)
+
 ---
 
 ## Interceptor와 Filter의 차이
 ## Session과 Cookie의 차이
 ## SessionScope와 ApplicationScope의 차이 
+## @Autowired 동작원리
+https://sejinik.tistory.com/252
