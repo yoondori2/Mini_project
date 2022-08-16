@@ -30,6 +30,19 @@
 1. Maven project 관련된 세팅 하기
 2. 라이브러리 설정하기(servlet-api, jsp-api, jsti,springWebMVC)
 ## SpringMVC Java로 세팅하기 
+### 0. servlet-context, root-context, web 파일 세팅하기 
+
+<details>
+<summary>web.xml</summary>
+<div markdown="1">
+web.xml은 DD (Deployment Descriptor : 배포 설명자)라고 불리며, Web Application의 설정파일이다.
+
+DD는 Web Application 실행 시 메모리에 로드된다.
+
+즉, web.xml이란 웹 어플리케이션을 실행시킬 때 함께 올라가야할 설정(설명)들을 정의해놓은 것이다.
+</div>
+</details>
+
 ### 1. 테이블 만들기 
 1. 게시판 테이블, 유저 테이블 만들기
 2. 테이블과 동일하게 Beans 클래스 만들기 
