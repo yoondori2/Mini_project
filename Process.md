@@ -42,7 +42,7 @@
 <summary>Interceptor란</summary>
 <div markdown="1">
   - 확인하여 Controller의 메서드를 호출 하기 전이나 후에 다른 메서드를 호출 할 수 있도록 가로 채 가는 개념이다.</br>
-- 로그인 여부 확인, 등급별 서비스 사용 권한 확인 등의 작업을 처리할 때 많이 사용합니다.</br>
+- 로그인 여부 확인, 등급별 서비스 사용 권한 확인 등의 작업을 처리할 때 많이 사용한다.</br>
 - 여기선 controller 실행되기 전에 수행되야 하므로 prehandle를 사용할 것이다.
 - preHandle : Controller의 메서드가 호출되기 전 호출된다. 이 메서드가 false를 반환하면 코드의 흐름이 중단된다.
 
