@@ -12,7 +12,7 @@
 
 [1. Interceptor와 Filter의 차이는?](#Interceptor와-Filter의-차이) 
 
-[2.Session 과 Cookie의 차이는?](#Session-과-Cookie의-차이)
+[2.Session 과 Cookie의 차이는?](#Session과-Cookie의-차이)
 
 [3.SessionScope와 ApplicationScope의 차이는?](#SessionScope와-ApplicationScope의-차이)
 
