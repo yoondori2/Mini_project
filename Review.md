@@ -16,7 +16,7 @@
 
 [3.SessionScope와 ApplicationScope의 차이는?](#SessionScope와-ApplicationScope의-차이)
 
-[4.@Autowired 동작하는 원리, 이름이 같은 bean이 있는 경우 어떻게 스프링이 처리하는가?](#@Autowired-동작원리)
+[4.@Autowired 동작하는 원리, 이름이 같은 bean이 있는 경우 어떻게 스프링이 처리하는가?](#@Autowired)
 
 ---
 
@@ -134,7 +134,7 @@
 - Application Scope 동안 사용할 수 있는 메모리 영역이 만들어지며 Servlet Context 라는 클래스 타입의 객체로 관리됨
 - ServletContext에 저장된 데이터나 객체는 서버가 종료되기 전까지 서버는 웹브라우저에 관계없이 동일한 메모리 공간을 사용하게 된다.
 
-## @Autowired 동작원리
+## @Autowired
 
 ### @Autowired란? 
 - @Autowired는 의존성을 "타입"을 통해 찾아 주입해주는 역할을 해준다
